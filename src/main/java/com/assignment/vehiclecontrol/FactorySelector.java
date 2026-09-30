@@ -5,7 +5,7 @@ import java.util.Locale;
 public final class FactorySelector {
     private FactorySelector() { }
 
-    public static String supportedFamilies() { return "city|offroad|electric"; }
+    public static String supportedFamilies() { return "city|offroad|electric|autonomous"; }
 
     public static VehicleSystemFactory resolve(String family) {
         if (family == null || family.isBlank()) {
@@ -15,6 +15,7 @@ public final class FactorySelector {
             case "city" -> new CityCarFactory();
             case "offroad" -> new OffRoadFactory();
             case "electric" -> new ElectricPerformanceFactory();
+            case "autonomous" -> new AutonomousFactory();
             default -> throw new IllegalArgumentException("Unsupported vehicle family: " + family);
         };
     }
