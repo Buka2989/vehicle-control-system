@@ -1,6 +1,6 @@
 package com.assignment.vehiclecontrol;
 
-public final class ElectricPerformanceEngineController {
+public final class ElectricPerformanceEngineController implements EngineController {
     private int speed;
 
     public int maximumSpeed() { return 250; }
