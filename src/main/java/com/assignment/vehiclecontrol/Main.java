@@ -6,23 +6,16 @@ public final class Main {
             System.out.println("Usage: <city|offroad|electric>");
             return;
         }
-        switch (args[0]) {
-            case "city" -> {
-                EngineController engine = new CityCarEngineController();
-                engine.accelerateTo(40);
-                System.out.println("City trip at " + engine.speed() + " km/h");
-            }
-            case "offroad" -> {
-                EngineController engine = new OffRoadEngineController();
-                engine.accelerateTo(40);
-                System.out.println("Off-road trip at " + engine.speed() + " km/h");
-            }
-            case "electric" -> {
-                EngineController engine = new ElectricPerformanceEngineController();
-                engine.accelerateTo(40);
-                System.out.println("Electric trip at " + engine.speed() + " km/h");
-            }
-            default -> System.out.println("Unsupported vehicle family: " + args[0]);
+        EngineStartup startup = switch (args[0]) {
+            case "city" -> new CityCarStartup();
+            case "offroad" -> new OffRoadStartup();
+            case "electric" -> new ElectricPerformanceStartup();
+            default -> null;
+        };
+        if (startup == null) {
+            System.out.println("Unsupported vehicle family: " + args[0]);
+            return;
         }
+        System.out.println("Trip at " + startup.start(40).speed() + " km/h");
     }
 }
