@@ -1,0 +1,125 @@
+@startuml
+title Vehicle Control System — Factory Method and Abstract Factory
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+package "Products shared by the patterns" {
+interface EngineController {
+  maximumSpeed() : int
+  accelerateTo(target : int) : void
+  speed() : int
+  cutPower() : void
+}
+interface BrakeSystem {
+  stoppingDistance(speed : int) : double
+  prepare() : String
+}
+interface NavigationSystem {
+  routeTo(destination : String) : String
+  recommendedSpeed() : int
+}
+class CityCarEngineController
+EngineController <|.. CityCarEngineController
+class CityCarBrakeSystem
+BrakeSystem <|.. CityCarBrakeSystem
+class CityCarNavigationSystem
+NavigationSystem <|.. CityCarNavigationSystem
+class OffRoadEngineController
+EngineController <|.. OffRoadEngineController
+class OffRoadBrakeSystem
+BrakeSystem <|.. OffRoadBrakeSystem
+class OffRoadNavigationSystem
+NavigationSystem <|.. OffRoadNavigationSystem
+class ElectricPerformanceEngineController
+EngineController <|.. ElectricPerformanceEngineController
+class ElectricPerformanceBrakeSystem
+BrakeSystem <|.. ElectricPerformanceBrakeSystem
+class ElectricPerformanceNavigationSystem
+NavigationSystem <|.. ElectricPerformanceNavigationSystem
+class AutonomousEngineController
+EngineController <|.. AutonomousEngineController
+class AutonomousBrakeSystem
+BrakeSystem <|.. AutonomousBrakeSystem
+class AutonomousNavigationSystem
+NavigationSystem <|.. AutonomousNavigationSystem
+}
+package "Factory Method" {
+abstract class EngineStartup {
+  # {abstract} createEngineController() : EngineController
+  + start(targetSpeed : int) : EngineController
+}
+class CityCarStartup
+EngineStartup <|-- CityCarStartup
+CityCarStartup ..> CityCarEngineController : creates
+class OffRoadStartup
+EngineStartup <|-- OffRoadStartup
+OffRoadStartup ..> OffRoadEngineController : creates
+class ElectricPerformanceStartup
+EngineStartup <|-- ElectricPerformanceStartup
+ElectricPerformanceStartup ..> ElectricPerformanceEngineController : creates
+class AutonomousStartup
+EngineStartup <|-- AutonomousStartup
+AutonomousStartup ..> AutonomousEngineController : creates
+EngineStartup ..> EngineController : validates and drives
+}
+package "Abstract Factory" {
+interface VehicleSystemFactory {
+  createEngineController() : EngineController
+  createBrakeSystem() : BrakeSystem
+  createNavigationSystem() : NavigationSystem
+}
+class CityCarFactory
+VehicleSystemFactory <|.. CityCarFactory
+CityCarFactory ..> CityCarStartup : starts engine at zero
+CityCarFactory ..> CityCarBrakeSystem : creates
+CityCarFactory ..> CityCarNavigationSystem : creates
+class OffRoadFactory
+VehicleSystemFactory <|.. OffRoadFactory
+OffRoadFactory ..> OffRoadStartup : starts engine at zero
+OffRoadFactory ..> OffRoadBrakeSystem : creates
+OffRoadFactory ..> OffRoadNavigationSystem : creates
+class ElectricPerformanceFactory
+VehicleSystemFactory <|.. ElectricPerformanceFactory
+ElectricPerformanceFactory ..> ElectricPerformanceStartup : starts engine at zero
+ElectricPerformanceFactory ..> ElectricPerformanceBrakeSystem : creates
+ElectricPerformanceFactory ..> ElectricPerformanceNavigationSystem : creates
+class AutonomousFactory
+VehicleSystemFactory <|.. AutonomousFactory
+AutonomousFactory ..> AutonomousStartup : starts engine at zero
+AutonomousFactory ..> AutonomousBrakeSystem : creates
+AutonomousFactory ..> AutonomousNavigationSystem : creates
+}
+package "Application" {
+class VehicleControlService {
+  - engine : EngineController
+  - brakes : BrakeSystem
+  - navigation : NavigationSystem
+  - tripActive : boolean
+  + VehicleControlService(factory : VehicleSystemFactory)
+  + prepareVehicleForRoute(destination : String) : String
+  + startTrip(destination : String) : String
+  + performEmergencyStop() : String
+}
+class FactorySelector {
+  {static} resolve(family : String) : VehicleSystemFactory
+  {static} supportedFamilies() : String
+}
+class Main {
+  {static} main(args : String[]) : void
+}
+Main ..> FactorySelector
+Main ..> VehicleControlService
+VehicleControlService ..> VehicleSystemFactory : constructor input
+VehicleControlService --> EngineController
+VehicleControlService --> BrakeSystem
+VehicleControlService --> NavigationSystem
+FactorySelector ..> CityCarFactory : selects
+FactorySelector ..> OffRoadFactory : selects
+FactorySelector ..> ElectricPerformanceFactory : selects
+FactorySelector ..> AutonomousFactory : selects
+}
+note bottom of VehicleControlService
+All components come from one trusted factory.
+No component injection constructor or replacement setters.
+end note
+@enduml
